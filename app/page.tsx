@@ -2,14 +2,68 @@ import { LeadForm } from "@/components/LeadForm";
 
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-6 py-16">
-      <div className="mb-8 space-y-3 text-center">
-        <h1 className="text-3xl font-bold text-cyan-300">Chasquilla</h1>
-        <p className="text-slate-300">
-          Describe your issue and we will connect you with an available technician via WhatsApp.
-        </p>
-      </div>
-      <LeadForm />
+    <main className="min-h-screen bg-[#0a0f1a] text-white">
+      {/* Nav */}
+      <nav className="flex items-center justify-between px-6 py-5 max-w-5xl mx-auto">
+        <div className="flex items-center gap-2">
+          <img src="/logo-maestrio.png" alt="Maestrio" className="h-8 w-auto" />
+        </div>
+        <span className="text-sm text-slate-400 hidden sm:block">Tu técnico en minutos · vía WhatsApp</span>
+      </nav>
+
+      {/* Hero */}
+      <section className="max-w-5xl mx-auto px-6 pt-12 pb-8 grid md:grid-cols-2 gap-12 items-center">
+        <div className="space-y-6">
+          <div className="inline-flex items-center gap-2 bg-[#4282d8]/10 border border-[#4282d8]/30 rounded-full px-4 py-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#4282d8] animate-pulse"></span>
+            <span className="text-sm text-[#4282d8] font-medium">Técnicos disponibles ahora</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl font-black leading-tight">
+            Soluciona tu problema<br />
+            <span className="text-[#4282d8]">hoy mismo.</span>
+          </h1>
+
+          <p className="text-slate-400 text-lg leading-relaxed">
+            Describe lo que necesitas y conectamos con el maestro indicado. Rápido, confiable y por WhatsApp.
+          </p>
+
+          <div className="flex flex-wrap gap-4 text-sm text-slate-400">
+            {["⚡ Respuesta inmediata", "✅ Técnicos verificados", "💬 Coordinación por WhatsApp"].map((item) => (
+              <span key={item} className="flex items-center gap-1">{item}</span>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <LeadForm />
+        </div>
+      </section>
+
+      {/* Services */}
+      <section className="max-w-5xl mx-auto px-6 py-12">
+        <p className="text-center text-slate-500 text-sm uppercase tracking-widest mb-8">Servicios disponibles</p>
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+          {[
+            { icon: "🔧", label: "Gasfiter" },
+            { icon: "⚡", label: "Electricista" },
+            { icon: "🔑", label: "Cerrajero" },
+            { icon: "🖌️", label: "Pintor" },
+            { icon: "🛠️", label: "Técnico" },
+            { icon: "🧹", label: "Limpieza" },
+          ].map(({ icon, label }) => (
+            <div key={label} className="flex flex-col items-center gap-2 bg-[#111827] border border-white/5 rounded-2xl py-4 px-2 hover:border-[#4282d8]/40 transition-colors">
+              <span className="text-2xl">{icon}</span>
+              <span className="text-xs text-slate-400">{label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="text-center py-8 text-slate-600 text-sm">
+        © {new Date().getFullYear()} Maestrio · Todos los derechos reservados
+      </footer>
     </main>
   );
 }

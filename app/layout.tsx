@@ -2,30 +2,14 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Chasquilla MVP",
-  description: "Marketplace to connect clients with technicians by WhatsApp.",
-  manifest: "/manifest.json",
+  title: "Maestrio · Tu técnico en minutos",
+  description: "Conectamos clientes con técnicos y maestros de confianza vía WhatsApp. Rápido, fácil y sin complicaciones.",
 };
 
-export default function RootLayout({
-  children
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>
-        {children}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js');
-                });
-              }
-            `,
-          }}
-        />
-      </body>
+    <html lang="es">
+      <body>{children}</body>
     </html>
   );
 }
