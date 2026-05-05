@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getOpenAIClient } from "@/lib/openai";
+import { getAnthropicClient } from "@/lib/anthropic";
 import type { ClassificationResult } from "@/types";
 
 const ClassificationSchema = z.object({
@@ -8,27 +8,31 @@ const ClassificationSchema = z.object({
 });
 
 export async function classifyProblem(message: string): Promise<ClassificationResult> {
-  const prompt = `
-Classify this home-service problem in JSON only.
+  const prompt = `Classify this home-service problem. Respond ONLY with a JSON object, no extra text.
 
 Rules:
-- category must be one short label (plumber, electrician, locksmith, painter, appliance_repair, cleaning, other)
-- urgency must be low, medium, or high
+- category must be one short label: plumber, electrician, locksmith, painter, appliance_repair, cleaning, other
+- urgency must be: low, medium, or high
 
 Problem:
 ${message}
-`;
 
-  const openai = getOpenAIClient();
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    temperature: 0.2,
-    response_format: { type: "json_object" },
+Respond with exactly this format:
+{"category": "...", "urgency": "..."}`;
+
+  const anthropic = getAnthropicClient();
+  const response = await anthropic.messages.create({
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 100,
     messages: [{ role: "user", content: prompt }]
   });
 
-  const text = completion.choices[0]?.message?.content ?? "{}";
-  const parsed = ClassificationSchema.safeParse(JSON.parse(text));
+  const text = response.content[0]?.type === "text" ? response.content[0].text.trim() : "{}";
+
+  // Strip markdown code fences if present
+  const clean = text.replace(/```json|```/g, "").trim();
+
+  const parsed = ClassificationSchema.safeParse(JSON.parse(clean));
 
   if (!parsed.success) {
     return { category: "other", urgency: "medium" };
