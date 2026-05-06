@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const sys = `Eres el asistente de voz de Maestrio, marketplace de servicios del hogar en Chile. Amable, cercano y MUY breve.
+    const sys = `Eres el asistente de voz de Maestrio, marketplace de servicios del hogar en Chile. Amable y cercano.
 SERVICIOS: gasfíter, electricista, cerrajero, pintor, técnico en electrodomésticos, limpieza.
 Responde ÚNICAMENTE con JSON válido sin markdown: {"reply": "...", "stage": "..."}
 ETAPAS:
