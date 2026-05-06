@@ -176,11 +176,19 @@ console.log("STAGE:", nextStage, "DATA:", data);
       setStage(nextStage);
 
       if (currentStage === "problem") setProblem(userMsg);
-      if (currentStage === "comuna") setComuna(userMsg);
-      if (currentStage === "phone") setPhone(userMsg);
-      if (cat) setCategoria(cat);
+if (currentStage === "comuna") setComuna(userMsg);
+if (currentStage === "phone") setPhone(userMsg);
+if (cat) setCategoria(cat);
 
-      if (nextStage === "done") {
+if (nextStage === "search") {
+  // Llamada final automática para lanzar la búsqueda
+  const finalPhone = currentStage === "phone" ? userMsg : currentPhone;
+  const finalComuna = currentStage === "comuna" ? userMsg : currentComuna;
+  const finalProblem = currentStage === "problem" ? userMsg : currentProblem;
+  setTimeout(() => callChat("buscar", "search", [], finalProblem, finalComuna, finalPhone), 800);
+}
+
+if (nextStage === "done") {
         typeText(reply);
         speak(reply);
         // Mostrar animación de búsqueda luego del mensaje
