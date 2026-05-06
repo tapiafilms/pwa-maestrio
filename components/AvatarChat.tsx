@@ -168,6 +168,7 @@ export function AvatarChat() {
       const data = await res.json();
       const reply = data.text || "Lo siento, no pude procesar eso.";
       const nextStage = data.stage as Stage;
+console.log("STAGE:", nextStage, "DATA:", data);
       const cat = data.categoria || "";
 
       const updatedMessages: Message[] = [...newMessages, { role: "assistant", content: reply }];
