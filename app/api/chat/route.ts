@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       }).catch(() => {});
 
       return NextResponse.json({
-        text: `Perfecto, ya estoy buscando un técnico cerca de ${comuna || "tu ubicación"}. En unos segundos recibirás un WhatsApp. ¡No te muevas! 🔧`,
+        text: `Listo, en este momento estoy buscando un técnico capacitado cerca de ${comuna || "tu ubicación"}. Cuando encuentre uno disponible, te va a escribir directo a tu WhatsApp, así que quédate atento a tu teléfono. ¡En unos minutos tienes noticias!`,
         stage: "done"
       });
     }
@@ -29,7 +29,7 @@ ETAPAS:
 - stage "comuna": Tienes el problema. Pregunta solo en qué comuna está.
 - stage "phone": Tienes problema y comuna. Pide número de WhatsApp.
 - stage "search": Tienes todo. Anuncia que buscas técnico ahora.
-REGLAS: máximo 2 oraciones, español chileno, tutéalo. Si el usuario da info antes, avanza de etapa.`;
+REGLAS: máximo 4 oraciones, español, tutéalo. Si el usuario da info antes, avanza de etapa.`;
 
     const response = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
