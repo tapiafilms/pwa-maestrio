@@ -75,7 +75,7 @@ export function TechnicianForm() {
         </p>
         <div className="mt-4 bg-[#0a0f1a] rounded-xl p-4 text-sm text-slate-400 border border-white/5">
           <p className="font-medium text-white mb-1">Paso siguiente importante:</p>
-          <p>Envía <span className="text-[#4282d8] font-mono font-bold">join &lt;palabra-clave&gt;</span> al número <span className="text-white font-mono">+14155238886</span> desde tu WhatsApp para activar las notificaciones.</p>
+          <p>Envía <span className="text-[#4282d8] font-mono font-bold">join make-shoulder </span> al número <span className="text-white font-mono">+14155238886</span> desde tu WhatsApp para activar las notificaciones. Este paso es fundamental para recibir trabajos. ¡Adelante!</p>
         </div>
       </div>
     );
