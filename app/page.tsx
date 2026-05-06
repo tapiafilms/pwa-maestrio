@@ -1,4 +1,5 @@
 import { LeadForm } from "@/components/LeadForm";
+import { AvatarChat } from "@/components/AvatarChat";
 
 export default function HomePage() {
   return (
@@ -12,30 +13,30 @@ export default function HomePage() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-5xl mx-auto px-6 pt-12 pb-8 grid md:grid-cols-2 gap-12 items-center">
-        <div className="space-y-6">
+      <section className="max-w-5xl mx-auto px-6 pt-8 pb-8 grid md:grid-cols-2 gap-12 items-center">
+        <div className="space-y-6 flex flex-col items-center md:items-start">
           <div className="inline-flex items-center gap-2 bg-[#4282d8]/10 border border-[#4282d8]/30 rounded-full px-4 py-1.5">
             <span className="w-2 h-2 rounded-full bg-[#4282d8] animate-pulse"></span>
             <span className="text-sm text-[#4282d8] font-medium">Técnicos disponibles ahora</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-black leading-tight">
-            Soluciona tu problema<br />
-            <span className="text-[#4282d8]">hoy mismo.</span>
+          <h1 className="text-4xl sm:text-5xl font-black leading-tight text-center md:text-left">
+            Cuéntame tu problema<br />
+            <span className="text-[#4282d8]">y busco un técnico.</span>
           </h1>
 
-          <p className="text-slate-400 text-lg leading-relaxed">
-            Describe lo que necesitas y conectamos con el maestro indicado. Rápido, confiable y por WhatsApp.
+          <p className="text-slate-400 text-base leading-relaxed text-center md:text-left">
+            Háblame o escríbeme lo que necesitas. Te conecto con el maestro indicado vía WhatsApp.
           </p>
 
-          <div className="flex flex-wrap gap-4 text-sm text-slate-400">
-            {["⚡ Respuesta inmediata", "✅ Técnicos verificados", "💬 Coordinación por WhatsApp"].map((item) => (
-              <span key={item} className="flex items-center gap-1">{item}</span>
-            ))}
-          </div>
+          {/* Avatar */}
+          <AvatarChat />
         </div>
 
         <div>
+          <div className="text-center mb-4">
+            <span className="text-slate-500 text-sm">O completa el formulario directamente</span>
+          </div>
           <LeadForm />
         </div>
       </section>
