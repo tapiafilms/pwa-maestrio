@@ -19,14 +19,15 @@ export function AvatarChat() {
 
   /* ── Voz del navegador ── */
   function getVoice() {
-    const voices = window.speechSynthesis?.getVoices() ?? [];
-    return (
-      voices.find(v => v.lang.startsWith("es") && /mónica|monica|lucía|lucia|elena/i.test(v.name)) ||
-      voices.find(v => v.lang === "es-ES") ||
-      voices.find(v => v.lang.startsWith("es")) ||
-      null
-    );
-  }
+  const voices = window.speechSynthesis?.getVoices() ?? [];
+  return (
+    voices.find(v => v.lang.startsWith("es") && /jorge|diego|carlos|miguel|pablo|juan|antonio|male/i.test(v.name)) ||
+    voices.find(v => v.lang === "es-ES" && !/mónica|monica|lucía|lucia|elena|female|paulina|marisol/i.test(v.name)) ||
+    voices.find(v => v.lang.startsWith("es") && !/mónica|monica|lucía|lucia|elena|female|paulina|marisol/i.test(v.name)) ||
+    voices.find(v => v.lang.startsWith("es")) ||
+    null
+  );
+}
 
   function speak(text: string) {
     if (!window.speechSynthesis) { setIsSpeaking(false); return; }
