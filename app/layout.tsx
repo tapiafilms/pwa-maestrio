@@ -3,7 +3,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Maestrio · Tu técnico en minutos",
-  description: "Conectamos clientes con técnicos y maestros de confianza vía WhatsApp. Rápido, fácil y sin complicaciones.",
+  description: "Conectamos clientes con técnicos y maestros de confianza vía WhatsApp.",
+  icons: {
+    icon: "/icon-192x192.png",
+    apple: "/icon-192x192.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
