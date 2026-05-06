@@ -7,40 +7,9 @@ type BubbleType = "doc" | "user" | "loading";
 
 interface Message { role: "user" | "assistant"; content: string; }
 
-const SEARCH_STEPS = [
-  { icon: "⚙️", text: "Buscando técnicos disponibles..." },
-  { icon: "📍", text: "Filtrando por tu ubicación..." },
-  { icon: "⭐", text: "Eligiendo el mejor para ti..." },
-  { icon: "📲", text: "¡Listo! Atento a tu WhatsApp." },
-];
-
 function SearchProgress({ categoria, comuna }: { categoria: string; comuna: string }) {
   const [step, setStep] = useState(0);
   const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const steps = [
-      { icon: "⚙️", text: `Buscando ${categoria || "técnicos"} disponibles...` },
-      { icon: "📍", text: `Filtrando cerca de ${comuna || "tu ubicación"}...` },
-      { icon: "⭐", text: "Eligiendo el mejor para ti..." },
-      { icon: "📲", text: "¡Listo! Atento a tu WhatsApp." },
-    ];
-
-    let currentStep = 0;
-    let currentProgress = 0;
-
-    const interval = setInterval(() => {
-      currentProgress += 2;
-      setProgress(currentProgress);
-
-      if (currentProgress >= 25 && currentStep === 0) { currentStep = 1; setStep(1); }
-      if (currentProgress >= 55 && currentStep === 1) { currentStep = 2; setStep(2); }
-      if (currentProgress >= 80 && currentStep === 2) { currentStep = 3; setStep(3); }
-      if (currentProgress >= 100) clearInterval(interval);
-    }, 80);
-
-    return () => clearInterval(interval);
-  }, [categoria, comuna]);
 
   const steps = [
     { icon: "⚙️", text: `Buscando ${categoria || "técnicos"} disponibles...` },
@@ -49,25 +18,32 @@ function SearchProgress({ categoria, comuna }: { categoria: string; comuna: stri
     { icon: "📲", text: "¡Listo! Atento a tu WhatsApp." },
   ];
 
+  useEffect(() => {
+    let currentStep = 0;
+    let currentProgress = 0;
+    const interval = setInterval(() => {
+      currentProgress += 2;
+      setProgress(currentProgress);
+      if (currentProgress >= 25 && currentStep === 0) { currentStep = 1; setStep(1); }
+      if (currentProgress >= 55 && currentStep === 1) { currentStep = 2; setStep(2); }
+      if (currentProgress >= 80 && currentStep === 2) { currentStep = 3; setStep(3); }
+      if (currentProgress >= 100) clearInterval(interval);
+    }, 80);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="w-full space-y-4 px-6 pb-6">
-      {/* Barra de progreso */}
       <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden">
-        <div
-          className="h-full bg-[#4282d8] rounded-full transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
+        <div className="h-full bg-[#4282d8] rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
       </div>
-
-      {/* Pasos */}
       <div className="space-y-2">
         {steps.map((s, i) => (
           <div key={i} className={`flex items-center gap-3 text-sm transition-all duration-500 ${
             i < step ? "text-slate-500 line-through" :
-            i === step ? "text-white font-medium" :
-            "text-slate-600"
+            i === step ? "text-white font-medium" : "text-slate-600"
           }`}>
-            <span className={`text-base transition-all ${i === step ? "scale-110" : "scale-100"}`}>
+            <span className={`text-base ${i === step ? "scale-110" : "scale-100"}`}>
               {i < step ? "✅" : s.icon}
             </span>
             <span>{s.text}</span>
@@ -99,8 +75,8 @@ export function AvatarChat() {
   const [isListening, setIsListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [micAvailable, setMicAvailable] = useState(false);
-  const [done, setDone] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [done, setDone] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -145,7 +121,14 @@ export function AvatarChat() {
     next();
   }
 
-  const callChat = useCallback(async (userMsg: string, currentStage: Stage, currentMessages: Message[], currentProblem: string, currentComuna: string, currentPhone: string) => {
+  const callChat = useCallback(async (
+    userMsg: string,
+    currentStage: Stage,
+    currentMessages: Message[],
+    currentProblem: string,
+    currentComuna: string,
+    currentPhone: string
+  ) => {
     setIsLoading(true);
     setBubbleType("loading");
     setBubbleText("");
@@ -168,35 +151,38 @@ export function AvatarChat() {
       const data = await res.json();
       const reply = data.text || "Lo siento, no pude procesar eso.";
       const nextStage = data.stage as Stage;
-console.log("STAGE:", nextStage, "DATA:", data);
       const cat = data.categoria || "";
 
-      const updatedMessages: Message[] = [...newMessages, { role: "assistant", content: reply }];
-      setMessages(updatedMessages);
+      setMessages([...newMessages, { role: "assistant", content: reply }]);
       setStage(nextStage);
-
       if (currentStage === "problem") setProblem(userMsg);
-if (currentStage === "comuna") setComuna(userMsg);
-if (currentStage === "phone") setPhone(userMsg);
-if (cat) setCategoria(cat);
+      if (currentStage === "comuna") setComuna(userMsg);
+      if (currentStage === "phone") setPhone(userMsg);
+      if (cat) setCategoria(cat);
 
-if (nextStage === "search") {
-  // Llamada final automática para lanzar la búsqueda
-  const finalPhone = currentStage === "phone" ? userMsg : currentPhone;
-  const finalComuna = currentStage === "comuna" ? userMsg : currentComuna;
-  const finalProblem = currentStage === "problem" ? userMsg : currentProblem;
-  setTimeout(() => callChat("buscar", "search", [], finalProblem, finalComuna, finalPhone), 800);
-}
+      // Siempre mostrar el reply del avatar
+      typeText(reply);
+      speak(reply);
 
-if (nextStage === "done") {
-        typeText(reply);
-        speak(reply);
-        // Mostrar animación de búsqueda luego del mensaje
-        setTimeout(() => setSearching(true), 1500);
-        setTimeout(() => setDone(true), 9000);
-      } else {
-        typeText(reply);
-        speak(reply);
+      // Cuando llegamos a search: lanzar búsqueda en background y mostrar animación
+      if (nextStage === "search") {
+        const finalPhone = currentStage === "phone" ? userMsg : currentPhone;
+        const finalComuna = currentStage === "comuna" ? userMsg : currentComuna;
+        const finalProblem = currentStage === "problem" ? userMsg : currentProblem;
+
+        setTimeout(() => {
+          fetch("/api/lead", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: `${finalProblem}. Comuna: ${finalComuna}`,
+              phone: finalPhone
+            })
+          }).catch(() => {});
+
+          setSearching(true);
+          setTimeout(() => setDone(true), 9000);
+        }, 1500);
       }
 
     } catch {
@@ -237,14 +223,12 @@ if (nextStage === "done") {
       recognitionRef.current = rec;
     }
 
-    setTimeout(() => {
-      callChat("inicio", "problem", [], "", "", "");
-    }, 500);
+    setTimeout(() => callChat("inicio", "problem", [], "", "", ""), 500);
   }, [callChat]);
 
   function sendMessage(text?: string) {
     const msg = (text ?? input).trim();
-    if (!msg || isLoading || done) return;
+    if (!msg || isLoading || done || searching) return;
     setInput("");
     setBubbleType("user");
     setBubbleText(msg);
@@ -317,7 +301,7 @@ if (nextStage === "done") {
         <SearchProgress categoria={categoria} comuna={comuna} />
       )}
 
-      {/* Input */}
+      {/* Input — oculto cuando está buscando o terminado */}
       {!done && !searching && (
         <div className="px-6 pb-6 flex gap-2">
           <input
@@ -344,6 +328,7 @@ if (nextStage === "done") {
         </div>
       )}
 
+      {/* Estado final */}
       {done && (
         <div className="px-6 pb-6 text-center space-y-2">
           <p className="text-[#4282d8] font-bold text-base">✅ ¡Técnico encontrado!</p>
