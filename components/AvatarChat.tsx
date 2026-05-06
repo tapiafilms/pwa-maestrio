@@ -7,6 +7,35 @@ type BubbleType = "doc" | "user" | "loading";
 
 interface Message { role: "user" | "assistant"; content: string; }
 
+function ToastNotification() {
+  const [visible, setVisible] = useState(true);
+  if (!visible) return null;
+  return (
+    <div className="fixed bottom-6 left-1/2 z-50 w-[90vw] max-w-sm" style={{
+      transform: "translateX(-50%)",
+      animation: "bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards"
+    }}>
+      <div className="bg-white rounded-2xl shadow-2xl p-4 flex items-start gap-3 border border-blue-100">
+        <div className="w-10 h-10 rounded-full bg-[#4282d8]/10 flex items-center justify-center flex-shrink-0 text-xl">
+          📲
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-gray-900 text-sm">¡Técnico encontrado!</p>
+          <p className="text-gray-500 text-xs mt-0.5 leading-relaxed">
+            Revisa tu WhatsApp, un técnico te escribirá en breve.
+          </p>
+        </div>
+        <button
+          onClick={() => setVisible(false)}
+          className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0 text-xl leading-none font-light"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function SearchProgress({ categoria, comuna }: { categoria: string; comuna: string }) {
   const [step, setStep] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -160,11 +189,9 @@ export function AvatarChat() {
       if (currentStage === "phone") setPhone(userMsg);
       if (cat) setCategoria(cat);
 
-      // Siempre mostrar el reply del avatar
       typeText(reply);
       speak(reply);
 
-      // Cuando llegamos a search: lanzar búsqueda en background y mostrar animación
       if (nextStage === "search") {
         const finalPhone = currentStage === "phone" ? userMsg : currentPhone;
         const finalComuna = currentStage === "comuna" ? userMsg : currentComuna;
@@ -264,77 +291,87 @@ export function AvatarChat() {
     "Describe tu problema...";
 
   return (
-    <div className="w-full rounded-2xl bg-[#111827] border border-white/5 shadow-xl overflow-hidden">
+    <>
+      {/* Keyframes para el toast */}
+      <style>{`
+        @keyframes bounceIn {
+          0%   { transform: translateX(-50%) translateY(120px); opacity: 0; }
+          60%  { transform: translateX(-50%) translateY(-14px); opacity: 1; }
+          80%  { transform: translateX(-50%) translateY(7px); }
+          100% { transform: translateX(-50%) translateY(0px); }
+        }
+      `}</style>
 
-      {/* Avatar + burbuja */}
-      <div className="flex flex-col items-center gap-4 px-6 pt-8 pb-6">
-        <div className="relative w-36 h-36 flex-shrink-0">
-          <video src="/avatar-escuchando.mp4" autoPlay loop muted playsInline
-            className={`absolute inset-0 w-full h-full object-cover rounded-full border-4 transition-all duration-300 ${
-              isSpeaking ? "opacity-0 scale-95" : "opacity-100 scale-100 border-[#4282d8]/50 shadow-[0_0_30px_rgba(66,130,216,0.3)]"
-            }`} />
-          <video src="/avatar-hablando.mp4" autoPlay loop muted playsInline
-            className={`absolute inset-0 w-full h-full object-cover rounded-full border-4 transition-all duration-300 ${
-              isSpeaking ? "opacity-100 scale-100 border-[#4282d8] shadow-[0_0_40px_rgba(66,130,216,0.5)]" : "opacity-0 scale-95"
-            }`} />
-          {isListening && <div className="absolute inset-0 rounded-full border-4 border-red-400 animate-pulse" />}
+      <div className="w-full rounded-2xl bg-[#111827] border border-white/5 shadow-xl overflow-hidden">
+
+        {/* Avatar + burbuja */}
+        <div className="flex flex-col items-center gap-4 px-6 pt-8 pb-6">
+          <div className="relative w-36 h-36 flex-shrink-0">
+            <video src="/avatar-escuchando.mp4" autoPlay loop muted playsInline
+              className={`absolute inset-0 w-full h-full object-cover rounded-full border-4 transition-all duration-300 ${
+                isSpeaking ? "opacity-0 scale-95" : "opacity-100 scale-100 border-[#4282d8]/50 shadow-[0_0_30px_rgba(66,130,216,0.3)]"
+              }`} />
+            <video src="/avatar-hablando.mp4" autoPlay loop muted playsInline
+              className={`absolute inset-0 w-full h-full object-cover rounded-full border-4 transition-all duration-300 ${
+                isSpeaking ? "opacity-100 scale-100 border-[#4282d8] shadow-[0_0_40px_rgba(66,130,216,0.5)]" : "opacity-0 scale-95"
+              }`} />
+            {isListening && <div className="absolute inset-0 rounded-full border-4 border-red-400 animate-pulse" />}
+          </div>
+
+          {/* Burbuja */}
+          <div className={`w-full rounded-2xl px-4 py-3 text-sm min-h-[52px] transition-all duration-300 ${
+            bubbleType === "user"
+              ? "bg-[#4282d8]/20 border border-[#4282d8]/30 text-slate-300 text-right"
+              : "bg-[#0a0f1a] border border-white/10 text-slate-200"
+          }`}>
+            {bubbleType === "loading" ? (
+              <span className="flex gap-1 items-center">
+                <span className="w-2 h-2 bg-[#4282d8] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-2 h-2 bg-[#4282d8] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="w-2 h-2 bg-[#4282d8] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+              </span>
+            ) : <span>{bubbleText}</span>}
+          </div>
         </div>
 
-        {/* Burbuja */}
-        <div className={`w-full rounded-2xl px-4 py-3 text-sm min-h-[52px] transition-all duration-300 ${
-          bubbleType === "user"
-            ? "bg-[#4282d8]/20 border border-[#4282d8]/30 text-slate-300 text-right"
-            : "bg-[#0a0f1a] border border-white/10 text-slate-200"
-        }`}>
-          {bubbleType === "loading" ? (
-            <span className="flex gap-1 items-center">
-              <span className="w-2 h-2 bg-[#4282d8] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-              <span className="w-2 h-2 bg-[#4282d8] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-              <span className="w-2 h-2 bg-[#4282d8] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-            </span>
-          ) : <span>{bubbleText}</span>}
-        </div>
+        {/* Animación de búsqueda */}
+        {searching && (
+          <SearchProgress categoria={categoria} comuna={comuna} />
+        )}
+
+        {/* Input */}
+        {!done && !searching && (
+          <div className="px-6 pb-6 flex gap-2">
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && sendMessage()}
+              placeholder={placeholder}
+              disabled={isLoading}
+              className="flex-1 rounded-xl bg-[#0a0f1a] border border-white/10 text-slate-100 placeholder-slate-600 px-4 py-3 text-sm outline-none focus:border-[#4282d8]/60 focus:ring-1 focus:ring-[#4282d8]/30 transition disabled:opacity-50"
+            />
+            {micAvailable && (
+              <button onClick={toggleMic} disabled={isLoading}
+                className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
+                  isListening ? "bg-red-500 animate-pulse" : "bg-[#0a0f1a] border border-white/10 text-slate-400 hover:text-white"
+                }`}>🎤</button>
+            )}
+            <button onClick={() => sendMessage()} disabled={isLoading || !input.trim()}
+              className="w-12 h-12 rounded-xl bg-[#4282d8] hover:bg-[#5291e8] disabled:bg-slate-700 disabled:text-slate-500 text-white flex items-center justify-center transition-all">
+              {isLoading
+                ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                : "→"}
+            </button>
+          </div>
+        )}
+
+        {/* Espacio cuando está done */}
+        {done && <div className="pb-4" />}
       </div>
 
-      {/* Animación de búsqueda */}
-      {searching && (
-        <SearchProgress categoria={categoria} comuna={comuna} />
-      )}
-
-      {/* Input — oculto cuando está buscando o terminado */}
-      {!done && !searching && (
-        <div className="px-6 pb-6 flex gap-2">
-          <input
-            ref={inputRef}
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && sendMessage()}
-            placeholder={placeholder}
-            disabled={isLoading}
-            className="flex-1 rounded-xl bg-[#0a0f1a] border border-white/10 text-slate-100 placeholder-slate-600 px-4 py-3 text-sm outline-none focus:border-[#4282d8]/60 focus:ring-1 focus:ring-[#4282d8]/30 transition disabled:opacity-50"
-          />
-          {micAvailable && (
-            <button onClick={toggleMic} disabled={isLoading}
-              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
-                isListening ? "bg-red-500 animate-pulse" : "bg-[#0a0f1a] border border-white/10 text-slate-400 hover:text-white"
-              }`}>🎤</button>
-          )}
-          <button onClick={() => sendMessage()} disabled={isLoading || !input.trim()}
-            className="w-12 h-12 rounded-xl bg-[#4282d8] hover:bg-[#5291e8] disabled:bg-slate-700 disabled:text-slate-500 text-white flex items-center justify-center transition-all">
-            {isLoading
-              ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              : "→"}
-          </button>
-        </div>
-      )}
-
-      {/* Estado final */}
-      {done && (
-        <div className="px-6 pb-6 text-center space-y-2">
-          <p className="text-[#4282d8] font-bold text-base">✅ ¡Técnico encontrado!</p>
-          <p className="text-slate-400 text-sm">Revisa tu WhatsApp, te escribirán en breve.</p>
-        </div>
-      )}
-    </div>
+      {/* Toast flotante */}
+      {done && <ToastNotification />}
+    </>
   );
 }
